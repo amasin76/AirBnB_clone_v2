@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Sets up web servers for the deployment of web_static
 
 # Install Nginx if it not already installed
 sudo apt-get -y update
