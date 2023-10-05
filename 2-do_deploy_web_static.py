@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Fabric script for deploying web_static to web servers
+
 """Fabric script for deploying web_static to web servers"""
 from fabric.api import env, put, run
 from os.path import exists
