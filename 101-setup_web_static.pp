@@ -1,13 +1,13 @@
+# Setup the web servers for the deployment of web_static
 class web_static_setup {
+  $directories = ['/data', '/data/web_static', '/data/web_static/releases', '/data/web_static/releases/test', '/data/web_static/shared']
   $nginx_package_name = 'nginx'
-  $web_static_path = '/data/web_static'
   $fake_html_content = '<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>'
-  
-  package { $nginx_package_name:
-    ensure => installed,
-  }
 
-  file { $web_static_path:
+  exec { '/usr/bin/env apt -y update' : }
+  -> package { $nginx_package_name: ensure => installed, }
+
+  file { $directories:
     ensure => directory,
     owner  => 'ubuntu',
     group  => 'ubuntu',
@@ -15,17 +15,22 @@ class web_static_setup {
     recurse => true,
   }
 
-  file { "${web_static_path}/releases/test/index.html":
+  file { '/data/web_static/releases/test/index.html':
     ensure  => file,
     content => $fake_html_content,
-    require => File[$web_static_path],
+    require => File[$directories],
   }
 
-  file { "${web_static_path}/current":
+  file { '/data/web_static/current':
     ensure => link,
-    target => "${web_static_path}/releases/test",
+    target => '/data/web_static/releases/test',
     force  => true,
-    require => File["${web_static_path}/releases/test/index.html"],
+    require => File['/data/web_static/releases/test/index.html'],
+  }
+
+  exec { 'chown -R ubuntu:ubuntu /data/':
+    path => '/usr/bin/:/usr/local/bin/:/bin/',
+    require => File['/data/web_static/current'],
   }
 
   file_line { 'nginx_config':
